@@ -318,7 +318,13 @@
   function compute(data, cfg) {
     var players = data.players;
     var standings = C.standings(data.games);
-    var opts = { minABPerGP: cfg.minABPerGP != null ? cfg.minABPerGP : 2, topN: cfg.leadersTopN || 5 };
+    var teamGames = {};
+    standings.forEach(function (s) { teamGames[s.team.toLowerCase()] = s.gp; });
+    var opts = {
+      minABPerGP: cfg.minABPerGP != null ? cfg.minABPerGP : 2,
+      topN: cfg.leadersTopN || 5,
+      teamGames: teamGames
+    };
     var names = {}; // union of teams seen in games + stats, alphabetical
     standings.forEach(function (s) { names[s.team.toLowerCase()] = s.team; });
     players.forEach(function (p) {

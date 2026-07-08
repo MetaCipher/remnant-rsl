@@ -107,6 +107,20 @@ check('qualifier excludes small-sample rate leaders but not counting stats', () 
   const hr = boards.find(b => b.key === 'hr');
   assert.strictEqual(hr.top.length, 2); // counting stat: both listed
 });
+check('rate-stat qualifier gates on TEAM games, not player games', () => {
+  const players = C.playersFromTotals([
+    { team: 'A', player: 'Sub', gp: 2, ab: 7, h: 6, r: 1, rbi: 1, d2: 0, d3: 0, hr: 0, bb: 0, k: 0, sf: 0, obe: 0 },      // .857 in 7 AB
+    { team: 'A', player: 'Regular', gp: 9, ab: 20, h: 16, r: 5, rbi: 5, d2: 0, d3: 0, hr: 0, bb: 0, k: 0, sf: 0, obe: 0 }, // .800 in 20 AB
+  ]);
+  const boards = C.leagueLeaders(players, { minABPerGP: 2, topN: 5, teamGames: { a: 9 } });
+  const avg = boards.find(b => b.key === 'avg');
+  assert.deepStrictEqual(avg.top.map(p => p.player), ['Regular']); // Sub needs 18 AB, has 7
+  const noTG = C.leagueLeaders(players, { minABPerGP: 2, topN: 5 }); // fallback: player GP
+  assert.strictEqual(noTG.find(b => b.key === 'avg').top[0].player, 'Sub');
+  const strip = C.teamLeaders(players, { minABPerGP: 2, teamGames: { a: 9 } });
+  assert.strictEqual(strip.find(c => c.label === 'AVG').player.player, 'Regular');
+});
+
 check('playersFromTotals derives stats from season-total rows (GameChanger)', () => {
   // Aj N. from the real Paladins GameChanger export
   const [p] = C.playersFromTotals([{
