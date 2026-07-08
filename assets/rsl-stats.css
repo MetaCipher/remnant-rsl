@@ -1,0 +1,373 @@
+/*
+ * RSL Stats widget styles.
+ * Palette + type matched to theremnant.life (Squarespace "Bedford" theme):
+ * charcoal ink #272727, accent #f0523d, futura-style headings ("Jost" from
+ * Google Fonts approximates the site's futura-pt; falls back to system).
+ */
+.rsl {
+  --rsl-accent: #f0523d;
+  --rsl-ink: #272727;
+  --rsl-ink-soft: #75716d;
+  --rsl-header: #201a16;
+  --rsl-line: #e8e5e1;
+  --rsl-zebra: #faf9f7;
+  --rsl-card: #ffffff;
+  --rsl-heading-font: "Jost", "Futura", "Trebuchet MS", -apple-system, sans-serif;
+  --rsl-body-font: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+
+  font-family: var(--rsl-body-font);
+  color: var(--rsl-ink);
+  max-width: 1060px;
+  margin: 0 auto;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.rsl *, .rsl *::before, .rsl *::after { box-sizing: border-box; }
+
+/* ---------- masthead ---------- */
+.rsl-masthead {
+  background: var(--rsl-header);
+  color: #fff;
+  border-radius: 12px 12px 0 0;
+  padding: 18px 22px 16px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.rsl-league {
+  font-family: var(--rsl-heading-font);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin: 0;
+  color: #fff;
+}
+.rsl-season {
+  font-family: var(--rsl-heading-font);
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rsl-accent);
+  margin-top: 2px;
+}
+.rsl-updated { font-size: 12px; color: rgba(255, 255, 255, 0.75); }
+.rsl-updated strong { color: #fff; font-weight: 600; }
+
+/* ---------- tabs ---------- */
+.rsl-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 14px;
+  background: var(--rsl-card);
+  border: 1px solid var(--rsl-line);
+  border-top: 0;
+  scrollbar-width: thin;
+}
+.rsl-tab {
+  font-family: var(--rsl-heading-font);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--rsl-ink-soft);
+  background: transparent;
+  border: 1px solid var(--rsl-line);
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.rsl-tab:hover { color: var(--rsl-ink); border-color: var(--rsl-ink-soft); }
+.rsl-tab.is-active {
+  background: var(--rsl-accent);
+  border-color: var(--rsl-accent);
+  color: #fff;
+}
+
+/* ---------- body ---------- */
+.rsl-body {
+  background: var(--rsl-card);
+  border: 1px solid var(--rsl-line);
+  border-top: 0;
+  padding: 18px 20px 22px;
+}
+.rsl-viewtitle {
+  font-family: var(--rsl-heading-font);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+  color: var(--rsl-ink);
+}
+.rsl-teamhead {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.rsl-record {
+  font-family: var(--rsl-heading-font);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--rsl-accent);
+}
+.rsl-record span { color: var(--rsl-ink-soft); font-weight: 400; font-size: 13px; }
+
+/* ---------- player of the week ---------- */
+.rsl-pow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--rsl-line);
+  border-left: 4px solid var(--rsl-accent);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 4px 0 14px;
+  background: var(--rsl-zebra);
+}
+.rsl-pow-star { color: var(--rsl-accent); font-size: 24px; line-height: 1; }
+.rsl-pow-kicker {
+  font-family: var(--rsl-heading-font);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rsl-ink-soft);
+}
+.rsl-pow-name { font-size: 16px; font-weight: 700; }
+.rsl-pow-note { font-size: 12.5px; color: var(--rsl-ink-soft); }
+
+/* ---------- team leader cards ---------- */
+.rsl-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 0 0 16px;
+}
+.rsl-card {
+  border: 1px solid var(--rsl-line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: center;
+}
+.rsl-card-stat {
+  font-family: var(--rsl-heading-font);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rsl-ink-soft);
+}
+.rsl-card-val {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--rsl-accent);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.rsl-card-name {
+  font-size: 12px;
+  color: var(--rsl-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- tables ---------- */
+.rsl-tablewrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--rsl-line);
+  border-radius: 8px;
+}
+.rsl-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.rsl-table th, .rsl-table td {
+  padding: 7px 9px;
+  text-align: right;
+  border-bottom: 1px solid var(--rsl-line);
+  font-size: 13px;
+}
+.rsl-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--rsl-header);
+  padding: 0;
+  z-index: 2;
+}
+.rsl-table thead button {
+  font-family: var(--rsl-heading-font);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  background: transparent;
+  border: 0;
+  padding: 9px 9px;
+  width: 100%;
+  text-align: right;
+  cursor: pointer;
+}
+.rsl-table thead th.rsl-textcol button { text-align: left; }
+.rsl-table thead button:hover { color: #fff; }
+.rsl-table thead button.is-sorted { color: #fff; }
+.rsl-caret { color: var(--rsl-accent); margin-left: 3px; }
+.rsl-table tbody tr:nth-child(even) { background: var(--rsl-zebra); }
+.rsl-table tbody tr:hover { background: #f3efec; }
+.rsl-table tbody tr:last-child td { border-bottom: 0; }
+.rsl-textcol {
+  text-align: left !important;
+  font-weight: 600;
+  position: sticky;
+  left: 0;
+  background: inherit;
+  z-index: 1;
+  box-shadow: 1px 0 0 var(--rsl-line);
+}
+.rsl-table thead th.rsl-textcol { z-index: 3; } /* paint over sibling headers when scrolled */
+.rsl-table tbody tr:nth-child(odd) .rsl-textcol { background: #fff; }
+.rsl-table tbody tr:nth-child(even) .rsl-textcol { background: var(--rsl-zebra); }
+.rsl-rank {
+  color: var(--rsl-ink-soft);
+  font-size: 11px !important;
+  width: 26px;
+  text-align: center !important;
+}
+th.rsl-rank { background: var(--rsl-header); }
+
+/* ---------- leader boards ---------- */
+.rsl-boards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+.rsl-board {
+  border: 1px solid var(--rsl-line);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.rsl-board h4 {
+  font-family: var(--rsl-heading-font);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--rsl-accent);
+}
+.rsl-qual {
+  display: block;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  color: var(--rsl-ink-soft);
+  text-transform: none;
+  font-weight: 400;
+}
+.rsl-board ol { list-style: none; margin: 0; padding: 0; counter-reset: rank; }
+.rsl-board li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 13px;
+  counter-increment: rank;
+}
+.rsl-board li::before {
+  content: counter(rank);
+  color: var(--rsl-ink-soft);
+  font-size: 11px;
+  min-width: 14px;
+}
+.rsl-board li:first-child { font-weight: 700; }
+.rsl-board li:first-child .rsl-lval { color: var(--rsl-accent); }
+.rsl-lname {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rsl-lname em {
+  font-style: normal;
+  font-size: 10.5px;
+  color: var(--rsl-ink-soft);
+  letter-spacing: 0.06em;
+}
+.rsl-lval { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* ---------- misc ---------- */
+.rsl-legend, .rsl-empty {
+  font-size: 11.5px;
+  color: var(--rsl-ink-soft);
+  margin: 10px 2px 0;
+}
+.rsl-foot {
+  font-size: 11.5px;
+  color: var(--rsl-ink-soft);
+  background: var(--rsl-card);
+  border: 1px solid var(--rsl-line);
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+  padding: 10px 20px 12px;
+}
+.rsl-demobadge {
+  display: inline-block;
+  background: var(--rsl-accent);
+  color: #fff;
+  font-family: var(--rsl-heading-font);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  border-radius: 4px;
+  padding: 2px 7px;
+  margin-right: 6px;
+  vertical-align: 1px;
+}
+.rsl-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 60px 0;
+  color: var(--rsl-ink-soft);
+  border: 1px solid var(--rsl-line);
+  border-radius: 12px;
+}
+.rsl-spin {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid var(--rsl-line);
+  border-top-color: var(--rsl-accent);
+  border-radius: 50%;
+  animation: rsl-spin 0.8s linear infinite;
+}
+@keyframes rsl-spin { to { transform: rotate(360deg); } }
+.rsl-error {
+  border: 1px solid #e5b8b0;
+  background: #fdf3f1;
+  border-radius: 12px;
+  padding: 24px;
+  color: var(--rsl-ink);
+}
+.rsl-error span { font-size: 12px; color: var(--rsl-ink-soft); }
+
+/* ---------- small screens ---------- */
+@media (max-width: 560px) {
+  .rsl-masthead { padding: 14px 16px 12px; }
+  .rsl-league { font-size: 17px; }
+  .rsl-body { padding: 14px 12px 16px; }
+  .rsl-table th, .rsl-table td { padding: 6px 7px; font-size: 12px; }
+}
