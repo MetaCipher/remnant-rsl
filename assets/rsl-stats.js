@@ -247,6 +247,7 @@
       el: container,
       cfg: config || window.RSL_CONFIG || {},
       view: null,           // 'standings' | 'leaders' | 'team:<Name>'
+      teamMode: 'table',    // 'table' | 'cards' — batting stats presentation
       sort: { key: 'player', dir: 1 },
       data: null,
       demo: false
@@ -422,6 +423,15 @@
     var newWrap = body.querySelector('.rsl-tablewrap');
     if (newWrap) newWrap.scrollLeft = keepX;
 
+    body.querySelectorAll('[data-mode]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var mode = btn.getAttribute('data-mode');
+        if (mode !== state.teamMode) {
+          state.teamMode = mode;
+          renderBody(state);
+        }
+      });
+    });
     body.querySelectorAll('[data-sort]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         if (state.view.indexOf('team:') !== 0) return; // standings keep rank order
@@ -547,11 +557,55 @@
     }
 
     if (players.length) {
-      html += sortableTable(BATTING_COLS, sortRows(players, state.sort), state.sort);
+      var cards = state.teamMode === 'cards';
+      html += '<div class="rsl-tablebar"><div class="rsl-viewtoggle" role="group" aria-label="Stats view">' +
+        '<button type="button" data-mode="table" aria-pressed="' + !cards + '"' +
+        (cards ? '' : ' class="is-on"') + '>Table</button>' +
+        '<button type="button" data-mode="cards" aria-pressed="' + cards + '"' +
+        (cards ? ' class="is-on"' : '') + '>Cards</button>' +
+        '</div></div>';
+      html += cards
+        ? renderPlayerCards(players)
+        : sortableTable(BATTING_COLS, sortRows(players, state.sort), state.sort);
     } else {
       html += '<p class="rsl-empty">No player stats for ' + esc(team) + ' yet.</p>';
     }
     return html;
+  }
+
+  function plural(n, word, pluralWord) {
+    return n + ' ' + (n === 1 ? word : (pluralWord || word + 's'));
+  }
+
+  /* Plain-language per-player cards, alphabetical for easy name lookup */
+  function renderPlayerCards(players) {
+    var list = players.slice().sort(function (a, b) {
+      return a.player.localeCompare(b.player);
+    });
+    var html = '<div class="rsl-pcards">';
+    list.forEach(function (p) {
+      var chips = [];
+      if (p.hr) chips.push(plural(p.hr, 'home run'));
+      if (p.d3) chips.push(plural(p.d3, 'triple'));
+      if (p.d2) chips.push(plural(p.d2, 'double'));
+      chips.push(plural(p.r, 'run') + ' scored');
+      chips.push(plural(p.rbi, 'run') + ' batted in');
+      if (p.bb) chips.push(plural(p.bb, 'walk'));
+      if (p.k) chips.push(plural(p.k, 'strikeout'));
+      html += '<div class="rsl-pcard">' +
+        '<div class="rsl-pcard-top"><span class="rsl-pcard-name">' + esc(p.player) + '</span>' +
+        '<span class="rsl-pcard-avg">' + fmt3(p.avg) + '<em>batting avg</em></span></div>' +
+        '<div class="rsl-pcard-line">' + p.h + '-for-' + p.ab + ' at the plate across ' +
+        plural(p.gp, 'game') + '</div>' +
+        '<div class="rsl-pcard-chips">' + chips.map(function (c) {
+          return '<span>' + esc(c) + '</span>';
+        }).join('') + '</div>' +
+        (p.ab + p.bb > 0
+          ? '<div class="rsl-pcard-ob">On base ' + Math.round(p.obp * 100) + '% of the time</div>'
+          : '') +
+        '</div>';
+    });
+    return html + '</div>';
   }
 
   /* ---------------- bootstrap ---------------- */
