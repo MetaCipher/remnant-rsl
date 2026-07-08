@@ -11,9 +11,10 @@ window.RSL_CONFIG = {
 
   // Tab (worksheet) names inside the Google Sheet.
   tabs: {
-    stats: "PlayerStats", // one row per player per game
-    games: "Games",       // one row per game (final scores)
-    pow: "POW"            // player of the week, one row per team per week
+    stats: "GCStats",             // season totals, filled by the GameChanger importer
+    statsFallback: "PlayerStats", // used until GCStats exists (manual game-by-game log)
+    games: "Games",               // one row per game (final scores)
+    pow: "POW"                    // player of the week, one row per team per week
   },
 
   leagueName: "RSL",

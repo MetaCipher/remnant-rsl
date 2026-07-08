@@ -5,19 +5,19 @@ Live season stats for the **Remnant Softball League** ([theremnant.life/rsl](htt
 ## How it works
 
 ```
-Pastor Blake edits          Google Sheets              This widget (static page,
-the Google Sheet    ──►     GViz JSON endpoint   ──►   hosted free on GitHub Pages)
-(one row per player          (public read-only,          │
- per game)                    no API key needed)         ▼
-                                              <iframe> on theremnant.life/rsl
-                                              (Squarespace Embed block)
+GameChanger CSVs       "⚾ RSL" import menu        Google Sheets           This widget (static page,
+(Results + team  ──►   in the Google Sheet   ──►   GViz JSON        ──►   hosted free on GitHub Pages)
+Season Stats,          (apps-script/Code.gs)       endpoint (public         │
+downloaded weekly)                                 read-only, keyless)      ▼
+                                                              <iframe> on theremnant.life
+                                                              (Squarespace Embed block)
 ```
 
 No server, no database, no API keys, no cost. The sheet is shared as
 "Anyone with the link: **Viewer**" and the widget reads it straight from the
-browser. All stats (AVG, OB%, SLG, OPS, OPR, hitting streaks, standings,
-games back, leaders) are computed by the widget from the raw game-by-game
-numbers — the pastor only ever types counting stats.
+browser. All stats (AVG, OB%, SLG, OPS, OPR, standings, games back, leaders)
+are computed by the widget from raw counting stats; the only manual entry
+left is Player of the Week.
 
 ## Repo map
 
@@ -29,7 +29,8 @@ numbers — the pastor only ever types counting stats.
 | `assets/rsl-stats.js` | Fetching, parsing, and rendering |
 | `assets/rsl-stats.css` | Styling (matched to theremnant.life palette + type) |
 | `assets/demo-data.js` | Sample data shown until a real sheet ID is configured |
-| `sample/*.csv` | Import these into Google Sheets to create the three tabs |
+| `apps-script/Code.gs` | GameChanger importer — paste into the sheet's Apps Script editor |
+| `sample/*.csv` | Templates for the sheet tabs (real GC exports stay local, gitignored) |
 | `docs/PLAN.md` | The plan, decisions, and reverse-engineered formulas |
 | `docs/SHEET-SETUP.md` | Google Sheet setup + Pastor Blake's weekly routine |
 | `docs/SQUARESPACE-SETUP.md` | Hosting on GitHub Pages + embedding in Squarespace |

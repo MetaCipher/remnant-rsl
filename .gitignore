@@ -1,0 +1,5 @@
+# Real GameChanger exports (player names) stay local
+sample/*Report*.csv
+sample/*Summer*.csv
+sample/*Results*.csv
+test-totals.html

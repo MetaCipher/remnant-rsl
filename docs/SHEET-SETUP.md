@@ -1,7 +1,49 @@
 # Google Sheet Setup
 
-The sheet is the league's single source of truth. It has **three tabs**;
-the website reads all of them automatically.
+The sheet is the league's single source of truth; the website reads it
+automatically. Stats flow in from **GameChanger exports** via a built-in
+importer (see below) — nobody types individual stats by hand.
+
+## One-time: install the GameChanger importer
+
+1. Open the sheet → **Extensions → Apps Script**.
+2. Delete any starter code, paste the entire contents of
+   [`apps-script/Code.gs`](../apps-script/Code.gs), save.
+3. Reload the spreadsheet — a **⚾ RSL** menu appears in the menu bar.
+4. First use only: Google asks to authorize the script (it only touches
+   this spreadsheet).
+
+## Weekly routine (Pastor Blake, ~5 min)
+
+1. In GameChanger, download this week's exports:
+   - the league **Results** CSV (all game scores), and
+   - each team's **Season Stats** CSV.
+2. Open the sheet → **⚾ RSL → Import GameChanger files…** → select all the
+   downloaded CSVs at once → **Import**. File types are auto-detected;
+   the dialog reports what was imported. (Uploading only some teams is
+   fine — the others keep their existing numbers.)
+3. Add a **Player of the Week** row per team on the `POW` tab (still manual).
+4. Done — the website updates within ~5 minutes.
+
+The importer fills two tabs:
+
+- **GCStats** — `Team, Player, GP, PA, AB, H, R, RBI, 2B, 3B, HR, BB, K, SF, OBE`,
+  one row per player (season totals). The team name comes from the export's
+  filename, matched against teams already in the data.
+- **Games** — rewritten from the Results export (chronological, all games).
+
+Note: hitting streaks (HS/LHS) aren't shown with GameChanger data — season
+totals can't produce them. The widget's OB% uses the league formula
+`(H+BB+OBE)/(AB+BB)`, so it can differ slightly from GC's own OBP.
+
+---
+
+# Manual mode (legacy / fallback)
+
+Everything below describes the original hand-entered game-by-game flow.
+It still works — the widget auto-detects which format the stats tab holds,
+and falls back to `PlayerStats` if `GCStats` doesn't exist yet. Manual mode
+is also the only way to get hitting-streak columns.
 
 ## One-time setup (Tim, ~10 minutes)
 

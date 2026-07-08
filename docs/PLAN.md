@@ -90,6 +90,22 @@ with the seven bgsd rows captured on 7/7/2026.
   a data-validation dropdown).
 - **~5 min propagation delay** from Google's cache. Acceptable for weekly updates.
 
+## Update 7/8/2026 — GameChanger integration
+
+The league scores games in GameChanger, so manual entry was replaced by an
+importer. Weekly flow: download GC's league **Results** CSV + per-team
+**Season Stats** CSVs → sheet menu **⚾ RSL → Import GameChanger files…**
+(Apps Script, `apps-script/Code.gs`) → tabs `GCStats` and `Games` are
+rewritten. The widget auto-detects season-totals vs game-log format in the
+stats tab and falls back to `PlayerStats` while `GCStats` doesn't exist.
+Consequences: HS/LHS (hitting streak) columns dropped — season totals can't
+produce them; all other columns and formulas unchanged (GC's raw counting
+stats feed the same bgsd formulas; OB% differs from GC's OBP by design
+because it counts ROE). GC's Leaders Report export is detected and skipped —
+it lacks R/AB/BB. Real GC export files stay out of the public repo
+(.gitignore) because they carry full player names; parser tests auto-skip
+without them.
+
 ## Future ideas
 
 - Upgrade to Business plan → paste the widget inline (auto-height, no iframe)

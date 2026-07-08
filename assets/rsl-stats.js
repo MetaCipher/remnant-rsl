@@ -110,6 +110,35 @@
     }).filter(function (r) { return r.team && r.player; });
   }
 
+  /* Season-totals rows (GCStats tab, from GameChanger exports) */
+  function isTotalsFormat(rawRows) {
+    return rawRows.some(function (r) {
+      return r.gp !== undefined || r.gamesplayed !== undefined;
+    });
+  }
+
+  function adaptTotals(rows) {
+    return rows.map(function (r) {
+      return {
+        team: pick(r, ['team', 'teamname']) || '',
+        player: pick(r, ['player', 'name', 'playername']) || '',
+        gp: toNum(pick(r, ['gp', 'gamesplayed'])),
+        pa: toNum(pick(r, ['pa', 'plateappearances'])),
+        ab: toNum(pick(r, ['ab', 'atbats'])),
+        h: toNum(pick(r, ['h', 'hits'])),
+        r: toNum(pick(r, ['r', 'runs'])),
+        rbi: toNum(pick(r, ['rbi', 'rbis'])),
+        d2: toNum(pick(r, ['2b', 'doubles'])),
+        d3: toNum(pick(r, ['3b', 'triples'])),
+        hr: toNum(pick(r, ['hr', 'homeruns'])),
+        bb: toNum(pick(r, ['bb', 'walks'])),
+        k: toNum(pick(r, ['k', 'so', 'strikeouts'])),
+        sf: toNum(pick(r, ['sf', 'sac', 'sacflies'])),
+        obe: toNum(pick(r, ['obe', 'roe', 'onbaseerror']))
+      };
+    });
+  }
+
   function adaptGames(rows) {
     return rows.map(function (r) {
       return {
@@ -193,9 +222,7 @@
     { key: 'obp', label: 'OB%', title: 'On-base %: (H + BB + OBE) / (AB + BB)', fmt: 'avg3' },
     { key: 'avg', label: 'AVG', title: 'Batting average: H / AB', fmt: 'avg3' },
     { key: 'slg', label: 'SLG', title: 'Slugging: total bases / AB', fmt: 'avg3' },
-    { key: 'ops', label: 'OPS', title: 'OB% + SLG', fmt: 'avg3' },
-    { key: 'hs', label: 'HS', title: 'Current hitting streak (games)' },
-    { key: 'lhs', label: 'LHS', title: 'Longest hitting streak (games)' }
+    { key: 'ops', label: 'OPS', title: 'OB% + SLG', fmt: 'avg3' }
   ];
 
   var STANDINGS_COLS = [
@@ -234,16 +261,41 @@
     var loaded;
     if (sheetId) {
       var tabs = state.cfg.tabs || {};
+      var statsTab = tabs.stats || 'PlayerStats';
+      var statsFetch = fetchTab(sheetId, statsTab).then(function (rows) {
+        if (!rows.length) throw new Error('tab "' + statsTab + '" is empty');
+        return rows;
+      });
+      if (tabs.statsFallback && tabs.statsFallback !== statsTab) {
+        statsFetch = statsFetch.catch(function () {
+          return fetchTab(sheetId, tabs.statsFallback);
+        });
+      }
       loaded = Promise.all([
-        fetchTab(sheetId, tabs.stats || 'PlayerStats'),
+        statsFetch,
         fetchTab(sheetId, tabs.games || 'Games').catch(function () { return []; }),
         fetchTab(sheetId, tabs.pow || 'POW').catch(function () { return []; })
       ]).then(function (res) {
-        return { stats: adaptStats(res[0]), games: adaptGames(res[1]), pow: adaptPow(res[2]) };
+        // stats tab may hold season totals (GCStats, from GameChanger
+        // exports) or a game-by-game log (PlayerStats) — detect by shape
+        var totals = isTotalsFormat(res[0]);
+        var gamelog = totals ? [] : adaptStats(res[0]);
+        return {
+          players: totals ? C.playersFromTotals(adaptTotals(res[0])) : C.aggregatePlayers(gamelog),
+          gamelogRows: gamelog,
+          games: adaptGames(res[1]),
+          pow: adaptPow(res[2])
+        };
       });
     } else if (window.RSL_DEMO_DATA) {
       state.demo = true;
-      loaded = Promise.resolve(adaptDemo(window.RSL_DEMO_DATA));
+      var demo = adaptDemo(window.RSL_DEMO_DATA);
+      loaded = Promise.resolve({
+        players: C.aggregatePlayers(demo.stats),
+        gamelogRows: demo.stats,
+        games: demo.games,
+        pow: demo.pow
+      });
     } else {
       loaded = Promise.reject(new Error('No sheetId configured and no demo data available.'));
     }
@@ -263,7 +315,7 @@
   }
 
   function compute(data, cfg) {
-    var players = C.aggregatePlayers(data.stats);
+    var players = data.players;
     var standings = C.standings(data.games);
     var opts = { minABPerGP: cfg.minABPerGP != null ? cfg.minABPerGP : 2, topN: cfg.leadersTopN || 5 };
     var names = {}; // union of teams seen in games + stats, alphabetical
@@ -275,7 +327,7 @@
       return a.localeCompare(b);
     });
     var through = '';
-    data.stats.concat(data.games).forEach(function (r) {
+    data.gamelogRows.concat(data.games).forEach(function (r) {
       if (r.date && r.date > through) through = r.date;
     });
     return {

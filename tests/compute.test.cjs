@@ -107,6 +107,19 @@ check('qualifier excludes small-sample rate leaders but not counting stats', () 
   const hr = boards.find(b => b.key === 'hr');
   assert.strictEqual(hr.top.length, 2); // counting stat: both listed
 });
+check('playersFromTotals derives stats from season-total rows (GameChanger)', () => {
+  // Aj N. from the real Paladins GameChanger export
+  const [p] = C.playersFromTotals([{
+    team: 'Paladins', player: 'Aj N.', gp: 8, pa: 25, ab: 24, h: 10, r: 9,
+    rbi: 8, d2: 4, d3: 0, hr: 1, bb: 1, k: 0, sf: 0, obe: 3,
+  }]);
+  approx(p.avg, 0.417);            // GC agrees: .417
+  approx(p.slg, 0.708);            // GC agrees: .708 (TB 17 / AB 24)
+  approx(p.obp, (10 + 1 + 3) / (24 + 1)); // our bgsd formula (GC's own OBP differs)
+  approx(p.opr, (9 + 8) / 24);
+  assert.strictEqual(p.pa, 25);    // provided PA wins over AB+BB+SF
+  assert.strictEqual(p.hs, undefined); // no streaks from totals
+});
 check('teamLeaders returns strip of best players', () => {
   const players = C.aggregatePlayers([
     { date: '1', team: 'A', player: 'Slugger', ab: 4, h: 3, r: 2, rbi: 5, d2: 0, d3: 0, hr: 2, bb: 0, k: 0, sf: 0, obe: 0 },
