@@ -1,14 +1,17 @@
 /*
  * RSL Stats widget styles.
- * Palette + type matched to theremnant.life (Squarespace "Bedford" theme):
- * charcoal ink #272727, accent #f0523d, futura-style headings ("Jost" from
- * Google Fonts approximates the site's futura-pt; falls back to system).
+ * Brand palette: deep maroon #75231d (masthead/table headers) and brick red
+ * #ad3c2f (accent). --rsl-accent-soft is a light tint of the brand red for
+ * text sitting ON the maroon (dark-red-on-maroon fails contrast).
+ * Futura-style headings ("Jost" from Google Fonts approximates the site's
+ * futura-pt; falls back to system).
  */
 .rsl {
-  --rsl-accent: #f0523d;
+  --rsl-accent: #ad3c2f;
+  --rsl-accent-soft: #e7b3aa;
   --rsl-ink: #272727;
   --rsl-ink-soft: #75716d;
-  --rsl-header: #201a16;
+  --rsl-header: #75231d;
   --rsl-line: #e8e5e1;
   --rsl-zebra: #faf9f7;
   --rsl-card: #ffffff;
@@ -51,7 +54,7 @@
   font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--rsl-accent);
+  color: var(--rsl-accent-soft);
   margin-top: 3px;
 }
 .rsl-updated { font-size: 12px; color: rgba(255, 255, 255, 0.75); text-align: right; }
@@ -61,7 +64,7 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.16em;
-  color: var(--rsl-accent);
+  color: var(--rsl-accent-soft);
   margin-top: 2px;
 }
 
@@ -233,7 +236,7 @@
 .rsl-table thead th.rsl-textcol button { text-align: left; }
 .rsl-table thead button:hover { color: #fff; }
 .rsl-table thead button.is-sorted { color: #fff; }
-.rsl-caret { color: var(--rsl-accent); margin-left: 3px; }
+.rsl-caret { color: var(--rsl-accent-soft); margin-left: 3px; }
 .rsl-table tbody tr:nth-child(even) { background: var(--rsl-zebra); }
 .rsl-table tbody tr:hover { background: #f3efec; }
 .rsl-table tbody tr:last-child td { border-bottom: 0; }

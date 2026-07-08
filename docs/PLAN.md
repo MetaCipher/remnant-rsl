@@ -22,7 +22,7 @@ with no further work.
 
 - **Data model**: [bgsd.com church league stats](https://www.bgsd.com/softball/stats/2026/ch-church-L2-26.shtml) — column set, standings columns (GP W L T · R/G RA/G RD/G · PCT · LWS · streak · GB), 11 leader categories, Player of the Week.
 - **Aesthetic**: [iScore Central](https://pro.iscorecentral.com/AAPB/stats?tab=batting&sort=avg) — clean cards, pill tabs, sortable dark-headed tables, `.667`-style rate stats.
-- **Site fit**: theremnant.life — Squarespace 7.0 "Bedford" template. Extracted tokens: ink `#272727`, header `#201a16`, accent `#f0523d`, Adobe fonts futura-pt/proxima-nova (approximated with Google's "Jost" + system stack, since the Adobe kit is licensed to their domain only).
+- **Site fit**: theremnant.life — Squarespace 7.0 "Bedford" template. Fonts: Adobe futura-pt/proxima-nova (approximated with Google's "Jost" + system stack, since the Adobe kit is licensed to their domain only). Colors (updated 7/8/2026 to league branding): maroon `#75231d` (masthead/table headers), brick red `#ad3c2f` (accent), plus light tint `#e7b3aa` for accent text on the maroon.
 
 ## Formulas (reverse-engineered from bgsd, verified against 7 published rows)
 
