@@ -70,8 +70,22 @@ function importGcFiles(files) {
   });
 
   if (games) writeGames(ss, games);
-  if (teamBlocks.length) writeStats(ss, teamBlocks);
+  if (teamBlocks.length) {
+    var unique = dedupeTeamBlocks(teamBlocks);
+    if (unique.length < teamBlocks.length) {
+      report.push('· multiple files for the same team selected — kept the last one per team');
+    }
+    writeStats(ss, unique);
+  }
   return report;
+}
+
+/* Same team uploaded twice in one batch (e.g. "Stats.csv" + "Stats (1).csv"):
+   keep only the last block per team so players aren't written twice. */
+function dedupeTeamBlocks(teamBlocks) {
+  var lastByTeam = {};
+  teamBlocks.forEach(function (b) { lastByTeam[b.team.toLowerCase()] = b; });
+  return Object.keys(lastByTeam).map(function (k) { return lastByTeam[k]; });
 }
 
 /* ---------------- pure parsing (no Sheets access) ---------------- */

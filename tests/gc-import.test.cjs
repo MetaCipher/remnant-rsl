@@ -64,6 +64,16 @@ check('sortableTime parses GC timestamps', () => {
   assert.strictEqual(sandbox.sortableTime('garbage'), null);
 });
 
+check('dedupeTeamBlocks keeps last block per team', () => {
+  const out = sandbox.dedupeTeamBlocks([
+    { team: 'Paladins', rows: [1] },
+    { team: 'Knights', rows: [2] },
+    { team: 'paladins', rows: [3] }, // case-insensitive dupe, later wins
+  ]);
+  assert.strictEqual(out.length, 2);
+  assert.deepStrictEqual(Array.from(out.find(b => b.team.toLowerCase() === 'paladins').rows), [3]);
+});
+
 const paladins = sampleGrid('Paladins Summer 2026 Stats.csv');
 if (paladins) {
   check('detects team stats export', () => {
