@@ -220,7 +220,7 @@
       el: container,
       cfg: config || window.RSL_CONFIG || {},
       view: null,           // 'standings' | 'leaders' | 'team:<Name>'
-      sort: { key: 'avg', dir: -1 },
+      sort: { key: 'player', dir: 1 },
       data: null,
       demo: false
     };
@@ -266,9 +266,14 @@
     var players = C.aggregatePlayers(data.stats);
     var standings = C.standings(data.games);
     var opts = { minABPerGP: cfg.minABPerGP != null ? cfg.minABPerGP : 2, topN: cfg.leadersTopN || 5 };
-    var teams = standings.length
-      ? standings.map(function (s) { return s.team; })
-      : uniqueTeams(players);
+    var names = {}; // union of teams seen in games + stats, alphabetical
+    standings.forEach(function (s) { names[s.team.toLowerCase()] = s.team; });
+    players.forEach(function (p) {
+      if (!names[p.team.toLowerCase()]) names[p.team.toLowerCase()] = p.team;
+    });
+    var teams = Object.keys(names).map(function (k) { return names[k]; }).sort(function (a, b) {
+      return a.localeCompare(b);
+    });
     var through = '';
     data.stats.concat(data.games).forEach(function (r) {
       if (r.date && r.date > through) through = r.date;
@@ -277,15 +282,6 @@
       players: players, standings: standings, pow: data.pow,
       teams: teams, opts: opts, through: through
     };
-  }
-
-  function uniqueTeams(players) {
-    var seen = {}, out = [];
-    players.forEach(function (p) {
-      var k = p.team.toLowerCase();
-      if (!seen[k]) { seen[k] = true; out.push(p.team); }
-    });
-    return out.sort();
   }
 
   function defaultView(state) {

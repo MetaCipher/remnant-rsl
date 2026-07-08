@@ -79,16 +79,16 @@
 }
 .rsl-tab {
   font-family: var(--rsl-heading-font);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   white-space: nowrap;
   color: var(--rsl-ink-soft);
   background: transparent;
   border: 1px solid var(--rsl-line);
   border-radius: 999px;
-  padding: 7px 14px;
+  padding: 5px 11px;
   cursor: pointer;
   transition: color 0.15s, background 0.15s, border-color 0.15s;
 }
@@ -376,8 +376,16 @@ th.rsl-rank { background: var(--rsl-header); }
 
 /* ---------- small screens ---------- */
 @media (max-width: 560px) {
-  .rsl-masthead { padding: 14px 16px 12px; }
-  .rsl-league { font-size: 17px; }
+  .rsl-masthead {
+    padding: 14px 16px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .rsl-league { font-size: 21px; }
+  .rsl-season { font-size: 10.5px; letter-spacing: 0.12em; }
+  .rsl-updated { text-align: left; }
+  .rsl-year { display: inline; margin-left: 5px; } /* keep year on the same line */
   .rsl-body { padding: 14px 12px 16px; }
   .rsl-table th, .rsl-table td { padding: 6px 7px; font-size: 12px; }
 }
