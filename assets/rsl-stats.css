@@ -38,23 +38,32 @@
 }
 .rsl-league {
   font-family: var(--rsl-heading-font);
-  font-size: 21px;
+  font-size: 27px;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   margin: 0;
+  line-height: 1.1;
   color: #fff;
 }
 .rsl-season {
   font-family: var(--rsl-heading-font);
   font-size: 12px;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
+  color: var(--rsl-accent);
+  margin-top: 3px;
+}
+.rsl-updated { font-size: 12px; color: rgba(255, 255, 255, 0.75); text-align: right; }
+.rsl-updated strong { color: #fff; font-weight: 600; }
+.rsl-year {
+  font-family: var(--rsl-heading-font);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   color: var(--rsl-accent);
   margin-top: 2px;
 }
-.rsl-updated { font-size: 12px; color: rgba(255, 255, 255, 0.75); }
-.rsl-updated strong { color: #fff; font-weight: 600; }
 
 /* ---------- tabs ---------- */
 .rsl-tabs {
@@ -97,6 +106,7 @@
   border-top: 0;
   padding: 18px 20px 22px;
 }
+.rsl-body:last-child { border-radius: 0 0 12px 12px; } /* no footer in live mode */
 .rsl-viewtitle {
   font-family: var(--rsl-heading-font);
   font-size: 17px;
@@ -309,7 +319,7 @@ th.rsl-rank { background: var(--rsl-header); }
 .rsl-lval { font-variant-numeric: tabular-nums; font-weight: 600; }
 
 /* ---------- misc ---------- */
-.rsl-legend, .rsl-empty {
+.rsl-empty {
   font-size: 11.5px;
   color: var(--rsl-ink-soft);
   margin: 10px 2px 0;

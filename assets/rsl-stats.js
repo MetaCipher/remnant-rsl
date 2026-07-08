@@ -171,12 +171,6 @@
     }
   }
 
-  function teamAbbrev(name) {
-    var words = name.trim().split(/\s+/);
-    if (words.length === 1) return words[0].slice(0, 3).toUpperCase();
-    return words.map(function (w) { return w[0]; }).join('').slice(0, 3).toUpperCase();
-  }
-
   /* ---------------- column definitions ---------------- */
 
   var BATTING_COLS = [
@@ -311,15 +305,26 @@
 
   /* ---------------- rendering ---------------- */
 
+  function yearOf(iso) {
+    var m = /^(\d{4})-/.exec(iso);
+    return m ? m[1] : '';
+  }
+
+  /* Builds the persistent shell (masthead + tabs + empty body) exactly once;
+     view/sort changes only re-render the body, so the tab strip's horizontal
+     scroll position survives clicking a team pill. */
   function render(state) {
     var d = state.data, cfg = state.cfg;
     var html = '<div class="rsl">';
 
     html += '<header class="rsl-masthead"><div>' +
       '<h2 class="rsl-league">' + esc(cfg.leagueName || 'League Stats') + '</h2>' +
-      '<div class="rsl-season">' + esc(cfg.seasonLabel || '') + '</div></div>';
+      (cfg.subtitle ? '<div class="rsl-season">' + esc(cfg.subtitle) + '</div>' : '') +
+      '</div>';
     if (d.through) {
-      html += '<div class="rsl-updated">Stats through <strong>' + esc(shortDate(d.through)) + '</strong></div>';
+      html += '<div class="rsl-updated">Stats through <strong>' + esc(shortDate(d.through)) + '</strong>' +
+        (yearOf(d.through) ? '<div class="rsl-year">' + yearOf(d.through) + '</div>' : '') +
+        '</div>';
     }
     html += '</header>';
 
@@ -329,22 +334,56 @@
     d.teams.forEach(function (t) { html += tabBtn(state, 'team:' + t, t); });
     html += '</nav>';
 
-    html += '<main class="rsl-body">';
-    if (state.view === 'standings') html += renderStandings(state);
-    else if (state.view === 'leaders') html += renderLeaders(state);
-    else html += renderTeam(state, state.view.slice(5));
-    html += '</main>';
+    html += '<main class="rsl-body"></main>';
 
-    html += '<footer class="rsl-foot">';
     if (state.demo) {
-      html += '<span class="rsl-demobadge">DEMO DATA</span> Sample data shown — set your Google Sheet ID in config.js.';
-    } else {
-      html += 'Updated automatically from the league scorekeeper&#39;s sheet.';
+      html += '<footer class="rsl-foot"><span class="rsl-demobadge">DEMO DATA</span> ' +
+        'Sample data shown — set your Google Sheet ID in config.js.</footer>';
     }
-    html += '</footer></div>';
+    html += '</div>';
 
     state.el.innerHTML = html;
-    wireEvents(state);
+
+    state.el.querySelectorAll('.rsl-tab').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.view = btn.getAttribute('data-view');
+        state.el.querySelectorAll('.rsl-tab').forEach(function (b) {
+          var on = b === btn;
+          b.classList.toggle('is-active', on);
+          b.setAttribute('aria-selected', on);
+        });
+        renderBody(state);
+      });
+    });
+
+    renderBody(state);
+  }
+
+  function renderBody(state) {
+    var body = state.el.querySelector('.rsl-body');
+    var wrap = body.querySelector('.rsl-tablewrap');
+    var keepX = wrap ? wrap.scrollLeft : 0;
+    var doc = document.scrollingElement || document.documentElement;
+    var keepY = doc.scrollTop;
+
+    if (state.view === 'standings') body.innerHTML = renderStandings(state);
+    else if (state.view === 'leaders') body.innerHTML = renderLeaders(state);
+    else body.innerHTML = renderTeam(state, state.view.slice(5));
+
+    doc.scrollTop = keepY;
+    var newWrap = body.querySelector('.rsl-tablewrap');
+    if (newWrap) newWrap.scrollLeft = keepX;
+
+    body.querySelectorAll('[data-sort]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (state.view.indexOf('team:') !== 0) return; // standings keep rank order
+        var key = btn.getAttribute('data-sort');
+        var textCol = key === 'player' || key === 'team';
+        if (state.sort.key === key) state.sort.dir *= -1;
+        else state.sort = { key: key, dir: textCol ? 1 : -1 };
+        renderBody(state);
+      });
+    });
   }
 
   function tabBtn(state, view, label) {
@@ -402,7 +441,6 @@
   function renderStandings(state) {
     var html = '<h3 class="rsl-viewtitle">Team Standings</h3>';
     html += sortableTable(STANDINGS_COLS, state.data.standings, null, true);
-    html += '<p class="rsl-legend">PCT counts ties as half a win · GB = games back · LWS = longest win streak · STRK = current streak</p>';
     return html;
   }
 
@@ -415,7 +453,7 @@
         (b.qualifiedNote ? '<span class="rsl-qual">' + esc(b.qualifiedNote) + '</span>' : '') + '</h4><ol>';
       b.top.forEach(function (p) {
         html += '<li><span class="rsl-lname">' + esc(p.player) +
-          ' <em>' + esc(teamAbbrev(p.team)) + '</em></span>' +
+          ' <em>' + esc(p.team) + '</em></span>' +
           '<span class="rsl-lval">' + fmt(p[b.key], b.fmt) + '</span></li>';
       });
       html += '</ol></section>';
@@ -462,30 +500,10 @@
 
     if (players.length) {
       html += sortableTable(BATTING_COLS, sortRows(players, state.sort), state.sort);
-      html += '<p class="rsl-legend">Tap a column to sort · OPR = (R+RBI)/AB · OB% = (H+BB+OBE)/(AB+BB) · HS/LHS = current/longest hitting streak</p>';
     } else {
       html += '<p class="rsl-empty">No player stats for ' + esc(team) + ' yet.</p>';
     }
     return html;
-  }
-
-  function wireEvents(state) {
-    state.el.querySelectorAll('.rsl-tab').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        state.view = btn.getAttribute('data-view');
-        render(state);
-      });
-    });
-    state.el.querySelectorAll('[data-sort]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        if (state.view.indexOf('team:') !== 0) return; // standings keep rank order
-        var key = btn.getAttribute('data-sort');
-        var textCol = key === 'player' || key === 'team';
-        if (state.sort.key === key) state.sort.dir *= -1;
-        else state.sort = { key: key, dir: textCol ? 1 : -1 };
-        render(state);
-      });
-    });
   }
 
   /* ---------------- bootstrap ---------------- */

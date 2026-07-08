@@ -16,8 +16,8 @@ window.RSL_CONFIG = {
     pow: "POW"            // player of the week, one row per team per week
   },
 
-  leagueName: "Remnant Softball League",
-  seasonLabel: "2026 Season",
+  leagueName: "RSL",
+  subtitle: "Whitley County Church Slowpitch Softball",
 
   // Leaders qualifier: minimum AB per game played to appear on rate-stat
   // boards (AVG/OPR/SLG/OPS). bgsd uses 2 (e.g. 12 AB after 6 games).
