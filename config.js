@@ -14,7 +14,8 @@ window.RSL_CONFIG = {
     stats: "GCStats",             // season totals, filled by the GameChanger importer
     statsFallback: "PlayerStats", // used until GCStats exists (manual game-by-game log)
     games: "Games",               // one row per game (final scores)
-    pow: "POW"                    // player of the week, one row per team per week
+    pow: "POW",                   // player of the week, one row per team per week
+    meta: "Meta"                  // import stamp, written by the importer
   },
 
   leagueName: "RSL",

@@ -151,6 +151,15 @@
     }).filter(function (r) { return r.team1 && r.team2; });
   }
 
+  /* Meta tab: Key/Value rows written by the importer ("LastUpdated"). */
+  function adaptMeta(rows) {
+    for (var i = 0; i < rows.length; i++) {
+      var key = normKey(pick(rows[i], ['key']) || '');
+      if (key === 'lastupdated') return normDate(pick(rows[i], ['value']));
+    }
+    return '';
+  }
+
   function adaptPow(rows) {
     return rows.map(function (r) {
       return {
@@ -275,7 +284,8 @@
       loaded = Promise.all([
         statsFetch,
         fetchTab(sheetId, tabs.games || 'Games').catch(function () { return []; }),
-        fetchTab(sheetId, tabs.pow || 'POW').catch(function () { return []; })
+        fetchTab(sheetId, tabs.pow || 'POW').catch(function () { return []; }),
+        fetchTab(sheetId, tabs.meta || 'Meta').catch(function () { return []; })
       ]).then(function (res) {
         // stats tab may hold season totals (GCStats, from GameChanger
         // exports) or a game-by-game log (PlayerStats) — detect by shape
@@ -285,7 +295,8 @@
           players: totals ? C.playersFromTotals(adaptTotals(res[0])) : C.aggregatePlayers(gamelog),
           gamelogRows: gamelog,
           games: adaptGames(res[1]),
-          pow: adaptPow(res[2])
+          pow: adaptPow(res[2]),
+          lastUpdated: adaptMeta(res[3])
         };
       });
     } else if (window.RSL_DEMO_DATA) {
@@ -339,7 +350,8 @@
     });
     return {
       players: players, standings: standings, pow: data.pow,
-      teams: teams, opts: opts, through: through
+      teams: teams, opts: opts, through: through,
+      lastUpdated: data.lastUpdated || ''
     };
   }
 
@@ -376,9 +388,12 @@
       '<h2 class="rsl-league">' + esc(cfg.leagueName || 'League Stats') + '</h2>' +
       (cfg.subtitle ? '<div class="rsl-season">' + esc(cfg.subtitle) + '</div>' : '') +
       '</div>';
-    if (d.through) {
-      html += '<div class="rsl-updated">Stats through <strong>' + esc(shortDate(d.through)) + '</strong>' +
-        (yearOf(d.through) ? '<div class="rsl-year">' + yearOf(d.through) + '</div>' : '') +
+    // prefer the sheet's import stamp; fall back to the latest game date
+    var stamp = d.lastUpdated || d.through;
+    var stampLabel = d.lastUpdated ? 'Updated' : 'Stats through';
+    if (stamp) {
+      html += '<div class="rsl-updated">' + stampLabel + ' <strong>' + esc(shortDate(stamp)) + '</strong>' +
+        (yearOf(stamp) ? '<div class="rsl-year">' + yearOf(stamp) + '</div>' : '') +
         '</div>';
     }
     html += '</header>';

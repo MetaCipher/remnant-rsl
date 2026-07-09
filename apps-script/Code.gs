@@ -24,6 +24,7 @@
 
 var GAMES_SHEET = 'Games';
 var STATS_SHEET = 'GCStats';
+var META_SHEET = 'Meta';
 var STATS_HEADER = ['Team', 'Player', 'GP', 'PA', 'AB', 'H', 'R', 'RBI',
   '2B', '3B', 'HR', 'BB', 'K', 'SF', 'OBE'];
 var GAMES_HEADER = ['Date', 'Team1', 'Score1', 'Team2', 'Score2'];
@@ -77,7 +78,16 @@ function importGcFiles(files) {
     }
     writeStats(ss, unique);
   }
+  if (games || teamBlocks.length) writeMeta(ss); // "Updated <date>" on the website
   return report;
+}
+
+/* Stamps the import date so the website can show "Updated <date>". */
+function writeMeta(ss) {
+  var sh = ss.getSheetByName(META_SHEET) || ss.insertSheet(META_SHEET);
+  sh.clearContents();
+  var stamp = Utilities.formatDate(new Date(), ss.getSpreadsheetTimeZone(), 'yyyy-MM-dd');
+  sh.getRange(1, 1, 2, 2).setValues([['Key', 'Value'], ['LastUpdated', stamp]]);
 }
 
 /* Same team uploaded twice in one batch (e.g. "Stats.csv" + "Stats (1).csv"):

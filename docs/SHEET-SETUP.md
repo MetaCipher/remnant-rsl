@@ -31,6 +31,9 @@ The importer fills two tabs:
   one row per player (season totals). The team name comes from the export's
   filename, matched against teams already in the data.
 - **Games** — rewritten from the Results export (chronological, all games).
+- **Meta** — a `LastUpdated` stamp written on every import; the website's
+  header shows it as "Updated <date>". (Without it, the site falls back to
+  showing the latest game date as "Stats through <date>".)
 
 Note: hitting streaks (HS/LHS) aren't shown with GameChanger data — season
 totals can't produce them. The widget's OB% uses the league formula
