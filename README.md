@@ -31,6 +31,7 @@ left is Player of the Week.
 | `assets/demo-data.js` | Sample data shown until a real sheet ID is configured |
 | `apps-script/Code.gs` | GameChanger importer — paste into the sheet's Apps Script editor |
 | `sample/*.csv` | Templates for the sheet tabs (real GC exports stay local, gitignored) |
+| `docs/DEPLOYMENT.md` | How data, code, Apps Script, and Squarespace deploy — caches, rollback, recovery |
 | `docs/PLAN.md` | The plan, decisions, and reverse-engineered formulas |
 | `docs/SHEET-SETUP.md` | Google Sheet setup + Pastor Blake's weekly routine |
 | `docs/SQUARESPACE-SETUP.md` | Hosting on GitHub Pages + embedding in Squarespace |
