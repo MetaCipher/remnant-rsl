@@ -38,7 +38,7 @@ with no further work.
 | HS / LHS | current / longest hitting streak | Game with ≥1 H extends; 0-fer with AB>0 breaks; walk-only game (AB=0) leaves it untouched. |
 | PCT | (W + 0.5·T) / GP | ties count half |
 | GB | ((W_lead − W) + (L − L_lead)) / 2 | |
-| Leaders qualifier | AB ≥ 2 × GP | bgsd uses "minimum 12 AB" at 6 games; configurable via `minABPerGP` |
+| Leaders qualifier | AB ≥ 10 (fixed) | league rule since 7/9/2026 (`leadersMinAB` in config); bgsd/GC scale by team games instead |
 
 These are locked in by `tests/compute.test.cjs`, which asserts exact equality
 with the seven bgsd rows captured on 7/7/2026.
@@ -91,6 +91,7 @@ All on 7/7–7/9/2026 (initial build week):
 - **Header date**: "Updated \<date\>" from the importer's Meta stamp (falls back to "Stats through \<latest game\>")
 - **Accuracy audit**: 1,239 datapoints verified against web.gc.com team pages, 0 mismatches
 - **Print flyer**: Figma file → https://www.figma.com/design/Jq2w8sXWejiHSNYNFCOVBs (Letter, vector QR to /rsl-stats)
+- **7/9 league rule changes**: OPR dropped everywhere, OBP leader board added; leaders qualifier simplified to a fixed 10 AB; tied leaders share a rank number (1-1-3 style); standings drop GP and show total RS/RA/DIFF instead of per-game rates
 
 ## Open items
 

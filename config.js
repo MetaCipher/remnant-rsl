@@ -21,9 +21,9 @@ window.RSL_CONFIG = {
   leagueName: "RSL",
   subtitle: "Whitley County Church Slowpitch Softball",
 
-  // Leaders qualifier: minimum AB per game played to appear on rate-stat
-  // boards (AVG/OPR/SLG/OPS). bgsd uses 2 (e.g. 12 AB after 6 games).
-  minABPerGP: 2,
+  // Leaders qualifier: minimum at-bats to appear on rate-stat boards
+  // (AVG/OBP/SLG/OPS). League rule as of 7/9/2026.
+  leadersMinAB: 10,
 
   // How many players per league-leader board.
   leadersTopN: 5

@@ -10,8 +10,10 @@ keep it that way. Full docs live in `docs/` (start with `DEPLOYMENT.md`).
   (H+BB+OBE)/(AB+BB) and OPR = (R+RBI)/AB are league conventions
   reverse-engineered from bgsd.com and locked by tests. GC's app shows a
   different OBP — that difference is deliberate.
-- **Leaders qualifier gates on TEAM games played** (min AB = 2 × team GP),
-  not the player's own GP. Regression here puts 2-game subs atop the boards.
+- **Leaders qualifier is a fixed minimum AB** (`leadersMinAB` in config.js,
+  league rule: 10) applied to the rate-stat boards (AVG/OBP/SLG/OPS).
+  Removing it puts 2-game subs atop the boards. OPR was removed from the UI
+  on 7/9/2026 (league decision) but stays in the compute engine and tests.
 - **`apps-script/Code.gs` does not deploy via git.** It runs as a pasted
   copy inside the Google Sheet (Extensions → Apps Script). After changing it
   here, tell the user to re-paste it.

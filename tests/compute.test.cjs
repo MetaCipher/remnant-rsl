@@ -99,26 +99,35 @@ check('qualifier excludes small-sample rate leaders but not counting stats', () 
     { date: '1', team: 'A', player: 'Regular', ab: 12, h: 6, r: 4, rbi: 4, d2: 0, d3: 0, hr: 2, bb: 0, k: 0, sf: 0, obe: 0 },
     { date: '1', team: 'A', player: 'SmallSample', ab: 1, h: 1, r: 1, rbi: 1, d2: 0, d3: 0, hr: 1, bb: 0, k: 0, sf: 0, obe: 0 },
   ]);
-  // Force gp: aggregate saw one "game" row each; Regular 12 AB in 1 gp qualifies (>= 2x1)
-  const boards = C.leagueLeaders(players, { minABPerGP: 2, topN: 5 });
+  const boards = C.leagueLeaders(players, { minAB: 10, topN: 5 });
   const avg = boards.find(b => b.key === 'avg');
-  assert.strictEqual(avg.top[0].player, 'Regular'); // SmallSample .1000 hits qualifier? 1 AB < 2 -> excluded
+  assert.strictEqual(avg.top[0].player, 'Regular'); // SmallSample: 1 AB < 10 -> excluded
   assert.strictEqual(avg.top.length, 1);
   const hr = boards.find(b => b.key === 'hr');
   assert.strictEqual(hr.top.length, 2); // counting stat: both listed
 });
-check('rate-stat qualifier gates on TEAM games, not player games', () => {
+check('rate-stat qualifier: fixed 10 AB minimum, exactly 10 qualifies', () => {
   const players = C.playersFromTotals([
-    { team: 'A', player: 'Sub', gp: 2, ab: 7, h: 6, r: 1, rbi: 1, d2: 0, d3: 0, hr: 0, bb: 0, k: 0, sf: 0, obe: 0 },      // .857 in 7 AB
+    { team: 'A', player: 'Sub', gp: 2, ab: 7, h: 6, r: 1, rbi: 1, d2: 0, d3: 0, hr: 0, bb: 0, k: 0, sf: 0, obe: 0 },       // .857 in 7 AB
+    { team: 'A', player: 'Edge', gp: 3, ab: 10, h: 9, r: 3, rbi: 3, d2: 0, d3: 0, hr: 0, bb: 0, k: 0, sf: 0, obe: 0 },     // .900 in 10 AB
     { team: 'A', player: 'Regular', gp: 9, ab: 20, h: 16, r: 5, rbi: 5, d2: 0, d3: 0, hr: 0, bb: 0, k: 0, sf: 0, obe: 0 }, // .800 in 20 AB
   ]);
-  const boards = C.leagueLeaders(players, { minABPerGP: 2, topN: 5, teamGames: { a: 9 } });
+  const boards = C.leagueLeaders(players, { minAB: 10, topN: 5 });
   const avg = boards.find(b => b.key === 'avg');
-  assert.deepStrictEqual(avg.top.map(p => p.player), ['Regular']); // Sub needs 18 AB, has 7
-  const noTG = C.leagueLeaders(players, { minABPerGP: 2, topN: 5 }); // fallback: player GP
-  assert.strictEqual(noTG.find(b => b.key === 'avg').top[0].player, 'Sub');
-  const strip = C.teamLeaders(players, { minABPerGP: 2, teamGames: { a: 9 } });
-  assert.strictEqual(strip.find(c => c.label === 'AVG').player.player, 'Regular');
+  assert.deepStrictEqual(avg.top.map(p => p.player), ['Edge', 'Regular']); // Sub (7 AB) excluded
+  const obp = boards.find(b => b.key === 'obp');
+  assert.ok(obp, 'OBP board exists (replaced OPR)');
+  assert.ok(!boards.find(b => b.key === 'opr'), 'OPR board removed');
+  const strip = C.teamLeaders(players, { minAB: 10 });
+  assert.strictEqual(strip.find(c => c.label === 'AVG').player.player, 'Edge');
+});
+
+check('standings expose total run differential', () => {
+  const s = C.standings([{ date: '1', team1: 'A', score1: 12, team2: 'B', score2: 5 }]);
+  const A = s.find(t => t.team === 'A');
+  assert.strictEqual(A.rf, 12);
+  assert.strictEqual(A.ra, 5);
+  assert.strictEqual(A.diff, 7);
 });
 
 check('playersFromTotals derives stats from season-total rows (GameChanger)', () => {
@@ -138,8 +147,8 @@ check('teamLeaders returns strip of best players', () => {
   const players = C.aggregatePlayers([
     { date: '1', team: 'A', player: 'Slugger', ab: 4, h: 3, r: 2, rbi: 5, d2: 0, d3: 0, hr: 2, bb: 0, k: 0, sf: 0, obe: 0 },
   ]);
-  const strip = C.teamLeaders(players, { minABPerGP: 2 });
-  assert.ok(strip.find(c => c.label === 'HR').player.player === 'Slugger');
+  const strip = C.teamLeaders(players, { minAB: 10 });
+  assert.ok(strip.find(c => c.label === 'HR').player.player === 'Slugger'); // counting stat: no AB gate
 });
 
 console.log('\n' + passed + ' checks passed');

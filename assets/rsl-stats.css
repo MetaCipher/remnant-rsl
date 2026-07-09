@@ -351,7 +351,7 @@ th.rsl-rank { background: var(--rsl-header); }
   text-transform: none;
   font-weight: 400;
 }
-.rsl-board ol { list-style: none; margin: 0; padding: 0; counter-reset: rank; }
+.rsl-board ol { list-style: none; margin: 0; padding: 0; }
 .rsl-board li {
   display: flex;
   justify-content: space-between;
@@ -359,13 +359,12 @@ th.rsl-rank { background: var(--rsl-header); }
   gap: 8px;
   padding: 4px 0;
   font-size: 13px;
-  counter-increment: rank;
 }
-.rsl-board li::before {
-  content: counter(rank);
+.rsl-lrank {
   color: var(--rsl-ink-soft);
   font-size: 11px;
   min-width: 14px;
+  font-variant-numeric: tabular-nums;
 }
 .rsl-board li:first-child { font-weight: 700; }
 .rsl-board li:first-child .rsl-lval { color: var(--rsl-accent); }

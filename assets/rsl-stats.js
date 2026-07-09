@@ -205,6 +205,7 @@
       case 'avg3': return fmt3(v);
       case 'dec1': return v.toFixed(1);
       case 'sdec1': return (v > 0 ? '+' : '') + v.toFixed(1);
+      case 'sint': return (v > 0 ? '+' : '') + Math.round(v);
       default: return String(Math.round(v));
     }
   }
@@ -227,8 +228,7 @@
     { key: 'sf', label: 'SF', title: 'Sacrifice flies' },
     { key: 'obe', label: 'OBE', title: 'On base by error' },
     { key: 'hg', label: 'H/G', title: 'Hits per game', fmt: 'dec1' },
-    { key: 'opr', label: 'OPR', title: 'Offensive potency: (R + RBI) / AB', fmt: 'avg3' },
-    { key: 'obp', label: 'OB%', title: 'On-base %: (H + BB + OBE) / (AB + BB)', fmt: 'avg3' },
+    { key: 'obp', label: 'OBP', title: 'On-base %: (H + BB + OBE) / (AB + BB)', fmt: 'avg3' },
     { key: 'avg', label: 'AVG', title: 'Batting average: H / AB', fmt: 'avg3' },
     { key: 'slg', label: 'SLG', title: 'Slugging: total bases / AB', fmt: 'avg3' },
     { key: 'ops', label: 'OPS', title: 'OB% + SLG', fmt: 'avg3' }
@@ -236,14 +236,13 @@
 
   var STANDINGS_COLS = [
     { key: 'team', label: 'Team', title: 'Team', text: true },
-    { key: 'gp', label: 'GP', title: 'Games played' },
     { key: 'w', label: 'W', title: 'Wins' },
     { key: 'l', label: 'L', title: 'Losses' },
     { key: 't', label: 'T', title: 'Ties' },
     { key: 'pct', label: 'PCT', title: 'Win % (ties count half)', fmt: 'avg3' },
-    { key: 'rg', label: 'R/G', title: 'Runs scored per game', fmt: 'dec1' },
-    { key: 'rag', label: 'RA/G', title: 'Runs allowed per game', fmt: 'dec1' },
-    { key: 'rdg', label: 'RD/G', title: 'Run differential per game', fmt: 'sdec1' },
+    { key: 'rf', label: 'RS', title: 'Total runs scored' },
+    { key: 'ra', label: 'RA', title: 'Total runs allowed' },
+    { key: 'diff', label: 'DIFF', title: 'Run differential', fmt: 'sint' },
     { key: 'gb', label: 'GB', title: 'Games back', fmt: 'gb' },
     { key: 'lws', label: 'LWS', title: 'Longest win streak' },
     { key: 'ps', label: 'STRK', title: 'Current streak', text: true }
@@ -329,12 +328,9 @@
   function compute(data, cfg) {
     var players = data.players;
     var standings = C.standings(data.games);
-    var teamGames = {};
-    standings.forEach(function (s) { teamGames[s.team.toLowerCase()] = s.gp; });
     var opts = {
-      minABPerGP: cfg.minABPerGP != null ? cfg.minABPerGP : 2,
-      topN: cfg.leadersTopN || 5,
-      teamGames: teamGames
+      minAB: cfg.leadersMinAB != null ? cfg.leadersMinAB : 10,
+      topN: cfg.leadersTopN || 5
     };
     var names = {}; // union of teams seen in games + stats, alphabetical
     standings.forEach(function (s) { names[s.team.toLowerCase()] = s.team; });
@@ -530,10 +526,15 @@
     boards.forEach(function (b) {
       html += '<section class="rsl-board"><h4>' + esc(b.label) +
         (b.qualifiedNote ? '<span class="rsl-qual">' + esc(b.qualifiedNote) + '</span>' : '') + '</h4><ol>';
-      b.top.forEach(function (p) {
-        html += '<li><span class="rsl-lname">' + esc(p.player) +
+      var prevVal = null, prevRank = 0;
+      b.top.forEach(function (p, i) {
+        var val = fmt(p[b.key], b.fmt);
+        var rank = val === prevVal ? prevRank : i + 1; // ties share a rank
+        prevVal = val; prevRank = rank;
+        html += '<li><span class="rsl-lrank">' + rank + '</span>' +
+          '<span class="rsl-lname">' + esc(p.player) +
           ' <em>' + esc(p.team) + '</em></span>' +
-          '<span class="rsl-lval">' + fmt(p[b.key], b.fmt) + '</span></li>';
+          '<span class="rsl-lval">' + val + '</span></li>';
       });
       html += '</ol></section>';
     });
