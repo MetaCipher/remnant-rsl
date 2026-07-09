@@ -67,17 +67,44 @@ with the seven bgsd rows captured on 7/7/2026.
 - **Games** — `Date, Team1, Score1, Team2, Score2` — one row per game (doubleheader = 2 rows). Drives standings and team records.
 - **POW** — `Date, Team, Player, Note` — player of the week; the newest row per team is shown on that team's tab.
 
-## Rollout checklist
+## Rollout checklist — completed 7/8/2026, league live
 
 - [x] Reverse-engineer reference data model + formulas; verify with tests
 - [x] Build widget (standings / leaders / team tabs / POW / sorting / mobile)
 - [x] Visual check in Chrome at desktop + phone widths
-- [ ] Create the Google Sheet from `sample/*.csv`, share as link-viewer (Tim)
-- [ ] Put sheet ID in `config.js`
-- [ ] Push repo to GitHub, enable Pages
-- [ ] Add Embed block iframe to theremnant.life/rsl
-- [ ] Dry run with Pastor Blake: enter one real week of stats, watch it appear
-- [ ] Hand off `docs/SHEET-SETUP.md` weekly-routine section to Pastor Blake
+- [x] Create the Google Sheet, share as link-viewer
+- [x] Put sheet ID in `config.js`
+- [x] Push repo to GitHub, enable Pages
+- [x] Embed on theremnant.life (moved to dedicated `/rsl-stats` page)
+- [x] Real data imported for all 7 teams (via GameChanger integration)
+
+## Changelog
+
+All on 7/7–7/9/2026 (initial build week):
+
+- **v1**: game-log data model, manual entry, full bgsd column set, live on Squarespace
+- **Rebrand**: league colors `#75231d`/`#ad3c2f`; header → "RSL / Whitley County…"
+- **Layout**: edge-to-edge content (hosting page supplies padding), alphabetical teams/players, compact pills
+- **GameChanger integration**: Apps Script importer (`apps-script/Code.gs`), season-totals mode, HS/LHS streak columns dropped, manual entry retired
+- **Cards view**: plain-language per-player cards with Table/Cards toggle (table default)
+- **Qualifier fix**: rate-stat leader boards gate on team games (2 AB × team GP) — was letting 2-game subs top the boards
+- **Header date**: "Updated \<date\>" from the importer's Meta stamp (falls back to "Stats through \<latest game\>")
+- **Accuracy audit**: 1,239 datapoints verified against web.gc.com team pages, 0 mismatches
+- **Print flyer**: Figma file → https://www.figma.com/design/Jq2w8sXWejiHSNYNFCOVBs (Letter, vector QR to /rsl-stats)
+
+## Open items
+
+- **OB% convention decision** (Tim): site uses the league formula (counts
+  reached-on-error), ~.09 higher than GameChanger's app OBP — the only
+  number that won't match the app. Either keep (documented in tooltips) or
+  switch to GC-style.
+- **Retire manual-mode scaffolding**: once the old `PlayerStats` tab is
+  renamed/deleted in the sheet, remove `statsFallback` from `config.js` so
+  stale data can never silently reappear.
+- **Known GC quirks** (documented, no action): leaders-report GP runs +1 vs
+  team exports for a few players; GC's web stats pages hide some low-PA
+  players its exports include; Knights' team page on Blake's login defaults
+  to their 2025 season.
 
 ## Known limitations & mitigations
 

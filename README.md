@@ -35,6 +35,7 @@ left is Player of the Week.
 | `docs/PLAN.md` | The plan, decisions, and reverse-engineered formulas |
 | `docs/SHEET-SETUP.md` | Google Sheet setup + Pastor Blake's weekly routine |
 | `docs/SQUARESPACE-SETUP.md` | Hosting on GitHub Pages + embedding in Squarespace |
+| `docs/SEASON-TRANSITION.md` | Yearly runbook: archive the season, start the next one |
 | `tests/compute.test.cjs` | Formula tests (`node tests/compute.test.cjs`) |
 
 ## Quick start (local preview)
