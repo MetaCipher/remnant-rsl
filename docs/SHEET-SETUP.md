@@ -22,7 +22,7 @@ importer (see below) — nobody types individual stats by hand.
    downloaded CSVs at once → **Import**. File types are auto-detected;
    the dialog reports what was imported. (Uploading only some teams is
    fine — the others keep their existing numbers.)
-3. Add a **Player of the Week** row per team on the `POW` tab (still manual).
+3. Add this week's **Player of the Week** row on the `POW` tab (still manual).
 4. Done — the website updates within ~5 minutes.
 
 The importer fills two tabs:
@@ -100,14 +100,16 @@ and streaks.
 |---|---|---|---|
 | 2026-05-09 | The Remnant | John Example | 3-for-4 with a homer |
 
-One row per team per week (or skip weeks — the newest row per team is shown).
+Add one row for the current week's Player of the Week. Only the single
+newest row (league-wide) is shown, on the Standings and Leaders tabs, so
+add just the current winner each week — older rows are kept as history.
 
 ## Pastor Blake's weekly routine (~10–15 min after games)
 
 1. Open the **RSL Stats 2026** sheet (works fine on a phone, easier on a computer).
 2. **Games tab** — add one row per game played with the final scores.
 3. **PlayerStats tab** — add one row per player per game from the scorebook.
-4. **POW tab** — add a Player of the Week row per team (optional).
+4. **POW tab** — add one row for this week's Player of the Week (optional).
 5. That's it. The website updates itself within about 5 minutes.
 
 ### Rules that keep the stats accurate

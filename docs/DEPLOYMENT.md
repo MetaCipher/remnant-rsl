@@ -42,7 +42,7 @@ flows through one of **four surfaces**. Only the first two change regularly.
 2. Open the Google Sheet → **⚾ RSL → Import GameChanger files…** → select
    all downloaded CSVs at once → Import. File types are auto-detected;
    duplicates within a batch are deduped (last file per team wins).
-3. Add a **POW** row per team by hand (the only manual data).
+3. Add this week's **POW** row by hand (the only manual data).
 
 **What the importer writes:**
 

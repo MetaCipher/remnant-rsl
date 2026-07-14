@@ -513,16 +513,41 @@
     return out;
   }
 
+  /* The single current Player of the Week: the newest POW row league-wide
+     (ties on date resolve to the first such row). Going forward the league
+     enters one POW per week, so the latest date is unique in practice. */
+  function currentPow(pows) {
+    var best = null;
+    for (var i = 0; i < pows.length; i++) {
+      if (!best || pows[i].date > best.date) best = pows[i];
+    }
+    return best;
+  }
+
+  function renderPow(state) {
+    var p = currentPow(state.data.pow);
+    if (!p) return '';
+    return '<div class="rsl-pow"><span class="rsl-pow-star">★</span><div>' +
+      '<div class="rsl-pow-kicker">Player of the Week' +
+      (p.date ? ' · ' + esc(shortDate(p.date)) : '') + '</div>' +
+      '<div class="rsl-pow-name">' + esc(p.player) +
+      (p.team ? ' <em>' + esc(p.team) + '</em>' : '') + '</div>' +
+      (p.note ? '<div class="rsl-pow-note">' + esc(p.note) + '</div>' : '') +
+      '</div></div>';
+  }
+
   function renderStandings(state) {
-    var html = '<h3 class="rsl-viewtitle">Team Standings</h3>';
+    var html = renderPow(state);
+    html += '<h3 class="rsl-viewtitle">Team Standings</h3>';
     html += sortableTable(STANDINGS_COLS, state.data.standings, null, true);
     return html;
   }
 
   function renderLeaders(state) {
     var boards = C.leagueLeaders(state.data.players, state.data.opts);
-    if (!boards.length) return '<p class="rsl-empty">No stats yet — check back after the first games!</p>';
-    var html = '<h3 class="rsl-viewtitle">League Leaders</h3><div class="rsl-boards">';
+    var html = renderPow(state);
+    if (!boards.length) return html + '<p class="rsl-empty">No stats yet — check back after the first games!</p>';
+    html += '<h3 class="rsl-viewtitle">League Leaders</h3><div class="rsl-boards">';
     boards.forEach(function (b) {
       html += '<section class="rsl-board"><h4>' + esc(b.label) +
         (b.qualifiedNote ? '<span class="rsl-qual">' + esc(b.qualifiedNote) + '</span>' : '') + '</h4><ol>';
@@ -554,18 +579,6 @@
         ' <span>(' + fmt3(rec.pct) + ')</span></div>';
     }
     html += '</div>';
-
-    // player of the week: latest entry for this team
-    var pows = d.pow.filter(function (p) { return p.team.toLowerCase() === team.toLowerCase(); });
-    pows.sort(function (a, b) { return a.date < b.date ? 1 : -1; });
-    if (pows[0]) {
-      html += '<div class="rsl-pow"><span class="rsl-pow-star">★</span><div>' +
-        '<div class="rsl-pow-kicker">Player of the Week' +
-        (pows[0].date ? ' · ' + esc(shortDate(pows[0].date)) : '') + '</div>' +
-        '<div class="rsl-pow-name">' + esc(pows[0].player) + '</div>' +
-        (pows[0].note ? '<div class="rsl-pow-note">' + esc(pows[0].note) + '</div>' : '') +
-        '</div></div>';
-    }
 
     var strip = C.teamLeaders(players, d.opts);
     if (strip.length) {

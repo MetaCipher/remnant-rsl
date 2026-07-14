@@ -14,7 +14,7 @@ with no further work.
 | Question | Decision | Consequence |
 |---|---|---|
 | Squarespace plan | **Personal/Basic** | No Code blocks → widget is hosted externally (GitHub Pages, free) and embedded via an **Embed block iframe**. Built to also work as a paste-in code block if the site is ever upgraded to Business. |
-| Sections | Standings, league leaders, per-team stats + record + team leaders + team Player of the Week | Tabs: `Standings · Leaders · <one per team>`. POW and team-leader cards live on each team's tab. |
+| Sections | Standings, league leaders, per-team stats + record + team leaders, plus the current Player of the Week | Tabs: `Standings · Leaders · <one per team>`. The single current POW banners the Standings and Leaders tabs; team-leader cards live on each team's tab. |
 | Data entry | **Game-by-game** (one row per player per game) | Pastor types only counting stats; the widget does all math. Also the only way to compute hitting streaks (HS/LHS). |
 | Stat columns | **Full bgsd set** | GP · PA · AB · H · R · RBI · 2B · 3B · HR · BB · K · SF · OBE · H/G · OPR · OB% · AVG · SLG · OPS · HS · LHS |
 
@@ -65,7 +65,7 @@ with the seven bgsd rows captured on 7/7/2026.
 
 - **PlayerStats** — `Date, Team, Player, AB, R, H, 2B, 3B, HR, RBI, BB, K, SF, OBE` — one row per player per game.
 - **Games** — `Date, Team1, Score1, Team2, Score2` — one row per game (doubleheader = 2 rows). Drives standings and team records.
-- **POW** — `Date, Team, Player, Note` — player of the week; the newest row per team is shown on that team's tab.
+- **POW** — `Date, Team, Player, Note` — player of the week; only the single newest row league-wide is shown, on the Standings and Leaders tabs.
 
 ## Rollout checklist — completed 7/8/2026, league live
 
