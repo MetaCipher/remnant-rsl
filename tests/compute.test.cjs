@@ -130,6 +130,85 @@ check('standings expose total run differential', () => {
   assert.strictEqual(A.diff, 7);
 });
 
+console.log('roster fixups (merge duplicates / drop subs):');
+check('applyRoster drops substitute rows (Sub, Sub Sub) but keeps real names', () => {
+  const rows = [
+    { team: 'Crusaders', player: 'Zach W.', ab: 4, h: 2 },
+    { team: 'Crusaders', player: 'Sub', ab: 3, h: 1 },
+    { team: 'Crusaders', player: 'Sub Sub', ab: 2, h: 0 },
+    { team: 'Crusaders', player: 'Suber', ab: 1, h: 1 }, // NOT a sub
+  ];
+  const kept = C.applyRoster(rows, { ignore: ['Sub'] }).map(r => r.player);
+  assert.deepStrictEqual(kept, ['Zach W.', 'Suber']);
+});
+check('applyRoster drops "New" filler rows but keeps real "New..." surnames', () => {
+  const rows = [
+    { team: 'Knights', player: 'Luke N.', ab: 4, h: 2 },
+    { team: 'Knights', player: 'New', ab: 3, h: 1 },        // filler
+    { team: 'Knights', player: 'New Player', ab: 2, h: 0 }, // filler
+    { team: 'Knights', player: 'Newton', ab: 1, h: 1 },     // real name, NOT dropped
+  ];
+  const kept = C.applyRoster(rows, { ignore: ['Sub', 'New'] }).map(r => r.player);
+  assert.deepStrictEqual(kept, ['Luke N.', 'Newton']);
+});
+check('applyRoster renames aliases to master, scoped to the right team, case-insensitively', () => {
+  const cfg = { merges: [{ team: 'Sugar Creek', master: 'Zachariah', aliases: ['Zach'] }] };
+  const rows = [
+    { team: 'sugar creek', player: 'zach', ab: 1 },     // alias, loose caps
+    { team: 'Sugar Creek', player: 'Zachariah', ab: 1 }, // master
+    { team: 'Knights', player: 'Zach', ab: 1 },          // same alias, other team -> untouched
+  ];
+  const named = C.applyRoster(rows, cfg).map(r => r.team + '/' + r.player);
+  assert.deepStrictEqual(named, ['sugar creek/Zachariah', 'Sugar Creek/Zachariah', 'Knights/Zach']);
+  assert.notStrictEqual(rows[0].player, 'Zachariah'); // input not mutated
+});
+check('merge sums counting stats and RE-DERIVES rates (does not average them)', () => {
+  // "Luke" (2-for-2, 1.000) + "Luke N." (1-for-6, .167) -> 3-for-8 (.375),
+  // which averaging the two rates (.583) would get wrong.
+  const cfg = { merges: [{ team: 'Knights', master: 'Luke N.', aliases: ['Luke'] }] };
+  const rows = C.applyRoster([
+    { team: 'Knights', player: 'Luke',    gp: 1, pa: 2, ab: 2, h: 2, r: 1, rbi: 1, d2: 1, d3: 0, hr: 0, bb: 0, k: 0, sf: 0, obe: 0 },
+    { team: 'Knights', player: 'Luke N.', gp: 3, pa: 7, ab: 6, h: 1, r: 2, rbi: 0, d2: 0, d3: 0, hr: 1, bb: 1, k: 2, sf: 0, obe: 1 },
+  ], cfg);
+  const players = C.playersFromTotals(rows);
+  assert.strictEqual(players.length, 1, 'two entries collapse to one player');
+  const p = players[0];
+  assert.strictEqual(p.player, 'Luke N.');
+  assert.strictEqual(p.gp, 4);   // 1 + 3
+  assert.strictEqual(p.ab, 8);   // 2 + 6
+  assert.strictEqual(p.h, 3);    // 2 + 1
+  assert.strictEqual(p.hr, 1);
+  assert.strictEqual(p.pa, 9);   // provided PAs summed (2 + 7)
+  approx(p.avg, 3 / 8);          // .375, not the .583 you'd get averaging
+  approx(p.obp, (3 + 1 + 1) / (8 + 1)); // (H+BB+OBE)/(AB+BB)
+});
+check('matching ignores periods/spacing; the master spelling folds in too', () => {
+  // Sheet stores "Luke N" (no period); config master is "Luke N." (with one).
+  // Only "Luke" is listed as an alias, yet all three collapse into "Luke N.".
+  const cfg = { merges: [{ team: 'Knights', master: 'Luke N.', aliases: ['Luke'] }] };
+  const players = C.playersFromTotals(C.applyRoster([
+    { team: 'Knights', player: 'Luke',   ab: 12, h: 5 },
+    { team: 'Knights', player: 'Luke N', ab: 7,  h: 3 }, // matches master despite missing "."
+  ], cfg));
+  assert.strictEqual(players.length, 1);
+  assert.strictEqual(players[0].player, 'Luke N.');
+  assert.strictEqual(players[0].ab, 19); // 12 + 7
+});
+check('master label need not match any row: both real spellings listed as aliases', () => {
+  // Nazarene: sheet has "Collin" and "C Cripe"; neither is "Collin C.".
+  const cfg = { merges: [{ team: 'Nazarene', master: 'Collin C.', aliases: ['Collin', 'C Cripe'] }] };
+  const players = C.playersFromTotals(C.applyRoster([
+    { team: 'Nazarene', player: 'Collin',  ab: 30, h: 12 },
+    { team: 'Nazarene', player: 'C Cripe', ab: 3,  h: 1 },
+    { team: 'Nazarene', player: 'Luke',    ab: 10, h: 4 }, // a *different* Luke — untouched
+  ], cfg));
+  const collin = players.find(p => p.player === 'Collin C.');
+  assert.ok(collin, 'folded into the Collin C. display label');
+  assert.strictEqual(collin.ab, 33);
+  assert.ok(players.find(p => p.player === 'Luke'), 'unrelated Luke left alone');
+  assert.strictEqual(players.length, 2);
+});
+
 check('playersFromTotals derives stats from season-total rows (GameChanger)', () => {
   // Aj N. from the real Paladins GameChanger export
   const [p] = C.playersFromTotals([{

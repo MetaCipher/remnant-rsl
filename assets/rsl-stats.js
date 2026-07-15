@@ -70,6 +70,12 @@
 
   function toNum(v) { var n = parseFloat(v); return isFinite(n) ? n : 0; }
 
+  /* Pulls the roster fixups out of config into the shape C.applyRoster wants. */
+  function rosterCfg(cfg) {
+    cfg = cfg || {};
+    return { merges: cfg.mergePlayers || [], ignore: cfg.ignorePlayers || [] };
+  }
+
   function isoDate(y, m, d) {
     return y + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
   }
@@ -286,12 +292,16 @@
         fetchTab(sheetId, tabs.pow || 'POW').catch(function () { return []; }),
         fetchTab(sheetId, tabs.meta || 'Meta').catch(function () { return []; })
       ]).then(function (res) {
+        // fold split-name players together and drop substitute rows before
+        // aggregation (see config.js: mergePlayers / ignorePlayers)
+        var roster = rosterCfg(state.cfg);
         // stats tab may hold season totals (GCStats, from GameChanger
         // exports) or a game-by-game log (PlayerStats) — detect by shape
         var totals = isTotalsFormat(res[0]);
-        var gamelog = totals ? [] : adaptStats(res[0]);
+        var totalRows = totals ? C.applyRoster(adaptTotals(res[0]), roster) : null;
+        var gamelog = totals ? [] : C.applyRoster(adaptStats(res[0]), roster);
         return {
-          players: totals ? C.playersFromTotals(adaptTotals(res[0])) : C.aggregatePlayers(gamelog),
+          players: totals ? C.playersFromTotals(totalRows) : C.aggregatePlayers(gamelog),
           gamelogRows: gamelog,
           games: adaptGames(res[1]),
           pow: adaptPow(res[2]),
@@ -301,9 +311,10 @@
     } else if (window.RSL_DEMO_DATA) {
       state.demo = true;
       var demo = adaptDemo(window.RSL_DEMO_DATA);
+      var demoStats = C.applyRoster(demo.stats, rosterCfg(state.cfg));
       loaded = Promise.resolve({
-        players: C.aggregatePlayers(demo.stats),
-        gamelogRows: demo.stats,
+        players: C.aggregatePlayers(demoStats),
+        gamelogRows: demoStats,
         games: demo.games,
         pow: demo.pow
       });

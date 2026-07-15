@@ -26,5 +26,29 @@ window.RSL_CONFIG = {
   leadersMinAB: 10,
 
   // How many players per league-leader board.
-  leadersTopN: 5
+  leadersTopN: 5,
+
+  // Combine duplicate roster entries. GameChanger sometimes lists one person
+  // under two names; each entry here folds the `aliases` into the `master`
+  // name. Their stats are added together and the rate stats (AVG/OBP/SLG/OPS)
+  // are recomputed from the combined totals — not averaged. Team + names match
+  // loosely (case, spaces, and periods are ignored), so "Luke N" and "Luke N."
+  // are the same — but the spelling must still match the sheet (it says "Johny
+  // J.", not "Johnny J."). GP is summed (fine unless one game is double-listed).
+  // Add a line whenever a new split-name player shows up.
+  mergePlayers: [
+    { team: "Knights",     master: "Luke N.",    aliases: ["Luke"] },
+    { team: "Nazarene",    master: "Collin C.",  aliases: ["Collin", "C Cripe"] },
+    { team: "Sugar Creek", master: "Brandon G.", aliases: ["Brandon"] },
+    { team: "Sugar Creek", master: "Johnny J.",  aliases: ["John", "Johny J."] },
+    { team: "Sugar Creek", master: "Zachariah",  aliases: ["Zach"] },
+    { team: "Sugar Creek", master: "Levi J.",    aliases: ["Levi"] }
+  ],
+
+  // Player names to drop entirely (GameChanger substitute/filler rows).
+  // Matched case-insensitively; a token also catches a trailing "<token> Sub",
+  // "<token> 2", etc., but not real names that merely start with those letters
+  // ("Sub" ignores "Sub Sub" but keeps "Suber"; "New" ignores "New Player" but
+  // keeps "Newton").
+  ignorePlayers: ["Sub", "New"]
 };
